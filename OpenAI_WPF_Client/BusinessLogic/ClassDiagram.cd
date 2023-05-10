@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.ChatGPT">
+    <Position X="13" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAAAIAAAAAAAAAAABAAgACCAAAAACAAEAAAAAAACAA=</HashCode>
+      <FileName>ChatGPT_API\ChatGPT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.ChatGPT_Context">
+    <Position X="9.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>ChatGPT_API\ChatGPT_Context.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.Choice">
+    <Position X="15.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAIAAAAAA=</HashCode>
+      <FileName>ChatGPT_API\Choice.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.EmbeddedStub">
+    <Position X="17.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ChatGPT_API\EmbeddedStub.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.Message">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ChatGPT_API\Message.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.RequestData">
+    <Position X="17.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>ChatGPT_API\RequestData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.ResponseData">
+    <Position X="19.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAgBAAAAAAEAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>ChatGPT_API\ResponseData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.ChatGPT_API.Usage">
+    <Position X="19.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAIAEAAA=</HashCode>
+      <FileName>ChatGPT_API\Usage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.BusinessLogic.Scenario">
+    <Position X="22.25" Y="7.5" Width="2.25" />
+    <NestedTypes>
+      <Enum Name="OpenAI_WPF_Client.BusinessLogic.Scenario.Severity" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>BusinessLogic\Scenario.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAgAAAEAAAAAAAAAAAAAAAACAAAAAAAgIA=</HashCode>
+      <FileName>BusinessLogic\Scenario.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.BusinessLogic.ScenariosRepository">
+    <Position X="22.5" Y="5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEAI=</HashCode>
+      <FileName>BusinessLogic\ScenariosRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.BusinessLogic.ChatGPT_WPF_RichTextBox_localized">
+    <Position X="6.75" Y="2.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAEIAAAAAgACCAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessLogic\ChatGPT_WPF_RichTextBox_localized.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenAI_WPF_Client.Windows.MainWindow">
+    <Position X="10.75" Y="6" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACgAAAAAAABiIABCQAABAhAAAAAAAAEAAAA=</HashCode>
+      <FileName>Windows\MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OpenAI_WPF_Client.Windows.ScenariosWindow">
+    <Position X="14.5" Y="6" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABABAAQBAACAAEAAAAAAAAAEAAEAAAAAA=</HashCode>
+      <FileName>Windows\ScenariosWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OpenAI_WPF_Client.Windows.SendDialogue">
+    <Position X="17.75" Y="6" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAABACCAAAAIAAAAAAAAAAgAAQAAA=</HashCode>
+      <FileName>Windows\SendDialogue.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
