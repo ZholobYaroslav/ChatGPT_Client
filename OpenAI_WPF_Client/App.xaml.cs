@@ -1,8 +1,16 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenAI.Client;
+using OpenAI_WPF_Client.BusinessLogic;
+using OpenAI_WPF_Client.BusinessLogic.Interfaces;
+using OpenAI_WPF_Client.Windows;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +22,9 @@ namespace OpenAI_WPF_Client
     /// </summary>
     public partial class App : Application
     {
+        public static IHost? AppHost { get; private set; }
+        public static IConfiguration Configuration { get; private set; }
+
         private static List<CultureInfo> m_Languages = new List<CultureInfo>();
         public static List<CultureInfo> Languages
         {
@@ -21,11 +32,39 @@ namespace OpenAI_WPF_Client
         }
         public App()
         {
+
+            AppHost = Host.CreateDefaultBuilder()
+                .ConfigureServices( (hostContext, services) =>
+                {
+                    services.AddSingleton<MainWindow>();
+                    services.AddHttpClient();
+                    services.AddTransient<IScenarioRepository, ScenarioInMemoryRepository>();
+                    services.AddTransient<IEmailOperations, EmailOperations>();
+                    services.AddTransient<IFileOperations, FileOperations>();
+                })
+                .Build();
+
             m_Languages.Clear();
             m_Languages.Add(new CultureInfo("en-US")); //neutral culture for this project
             m_Languages.Add(new CultureInfo("uk-UA"));
         }
 
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            Configuration = new ConfigurationBuilder()
+                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                .Build();
+
+            await AppHost!.StartAsync();
+            var startUpForm = AppHost.Services.GetRequiredService<MainWindow>();
+            startUpForm.Show();
+            base.OnStartup(e);
+        }
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            await AppHost!.StopAsync();
+            base.OnExit(e);
+        }
 
         public static event EventHandler LanguageChanged;
         public static CultureInfo Language
@@ -73,7 +112,7 @@ namespace OpenAI_WPF_Client
                 }
                 else
                 {
-                    //MessageBox.Show("СРАКА");
+                    //MessageBox.Show("Very bad");
                     Application.Current.Resources.MergedDictionaries.Add(dictionary);
                 }
 

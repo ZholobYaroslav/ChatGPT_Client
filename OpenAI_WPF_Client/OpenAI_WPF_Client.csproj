@@ -20,7 +20,13 @@
   <ItemGroup>
     <PackageReference Include="GemBox.Document" Version="35.0.1300" />
     <PackageReference Include="MailKit" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenAI.Client\OpenAI.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,11 +16,14 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using OpenAI_WPF_Client.BusinessLogic;
 using OpenAI_WPF_Client.ChatGPT_API;
-
 using GemBox.Document;
 using Microsoft.Win32;
 using System.Globalization;
 using System.Reflection.Metadata;
+using OpenAI.Client;
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using OpenAI_WPF_Client.BusinessLogic.Interfaces;
 
 namespace OpenAI_WPF_Client.Windows
 {
@@ -30,10 +33,25 @@ namespace OpenAI_WPF_Client.Windows
     public partial class MainWindow : Window
     {
         private ChatGPT_Context chatGPT_Client;
-        private ScenariosRepository scenariosRepository;
-        public MainWindow()
+
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IOpenAIClient _openAIClient;
+        private IScenarioRepository _scenarioRepository;
+        private IEmailOperations _emailOperations;
+        private IFileOperations _fileOperations;
+        public MainWindow(IHttpClientFactory httpClientFactory, IScenarioRepository scenarioRepository, IEmailOperations emailOperations, IFileOperations fileOperations)
         {
             InitializeComponent();
+            Console.OutputEncoding = Encoding.UTF8;
+            //var config = new ConfigurationBuilder()
+            //                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            //                    .Build();
+            this._fileOperations = fileOperations;
+            this._fileOperations.Rtb = richTextBox;
+            this._emailOperations = emailOperations;
+            this._scenarioRepository = scenarioRepository;
+            this._httpClientFactory = httpClientFactory;
+            this._openAIClient = new OpenAIClient(App.Configuration, _httpClientFactory, "2");
 
             App.LanguageChanged += LanguageChanged;
             CultureInfo currentLang = App.Language;
@@ -52,12 +70,14 @@ namespace OpenAI_WPF_Client.Windows
 
             ComponentInfo.SetLicense("FREE-LIMITED-KEY");
             chatGPT_Client = new ChatGPT_Context(new ChatGPT_WPF_RichTextBox_localized(richTextBox));
-            scenariosRepository = new();
-            scenariosComboBox.ItemsSource = scenariosRepository.Scenarios;// uses to display .ToString() of the item class => .Content
+            //scenariosRepository = new();
+            scenariosComboBox.ItemsSource = _scenarioRepository.Scenarios;// uses to display .ToString() of the item class => .Content
             richTextBox.Document.Blocks.Clear();
             sendButton.IsEnabled = false;
             richTextBox.IsEnabled = false;
             scenariosComboBox.IsEnabled = false;
+            this._scenarioRepository = scenarioRepository;
+            _emailOperations = emailOperations;
         }
 
         private void LanguageChanged(object? sender, EventArgs e)
@@ -72,8 +92,38 @@ namespace OpenAI_WPF_Client.Windows
                 item.IsChecked = ci != null && ci.Equals(currentLang);
             }
 
-            scenariosRepository = new();
-            scenariosComboBox.ItemsSource = scenariosRepository.Scenarios;
+            //_scenarioRepository = new();
+            _scenarioRepository.ScenarioDataSeeding();
+
+            scenariosComboBox.ItemsSource = _scenarioRepository.Scenarios;
+
+            (string, string) curLangTuple;
+            string previousLang = string.Empty;
+            if (App.Language.Name.Equals("uk-UA"))
+            {
+                curLangTuple = ("Користувач:", "Чат GPT:");
+                previousLang = "User:";
+            }
+            else
+            {
+                curLangTuple = ("User:", "ChatGPT:");
+                previousLang = "Користувач:";
+            }
+
+            string userText = new TextRange(richTextBox.Document.Blocks.LastBlock.ContentStart, richTextBox.Document.Blocks.LastBlock.ContentEnd).Text;
+
+            int startIndexOfWordToDelete = userText.LastIndexOf(previousLang);
+            //Console.WriteLine("start ind:"+startIndexOfWordToDelete);
+            userText = userText.Remove(startIndexOfWordToDelete, previousLang.Length+1);
+            //Console.WriteLine($"text after remove:|{userText
+            userText += $"{curLangTuple.Item1} ";
+            //Console.WriteLine($"text after insert correct word:|{userText}|");
+
+            richTextBox.Document.Blocks.Remove(richTextBox.Document.Blocks.LastBlock);
+            richTextBox.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run(userText)));
+
+            richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+            Keyboard.Focus(richTextBox);
         }
 
         private void ChangeLanguageClick(object sender, RoutedEventArgs e)
@@ -91,7 +141,7 @@ namespace OpenAI_WPF_Client.Windows
 
         private void scenariosComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(scenariosComboBox.SelectedItem is Scenario scenario)
+            if (scenariosComboBox.SelectedItem is Scenario scenario)
             {
                 richTextBox.AppendText(scenario.Description);
             }
@@ -99,8 +149,27 @@ namespace OpenAI_WPF_Client.Windows
 
         private async void sendButton_Click(object sender, RoutedEventArgs e)
         {
+            //deprecated method invocation from "Template method" pattern 
+            //await chatGPT_Client.Invoke();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"Request sent at {DateTime.Now}");
-            await chatGPT_Client.Invoke();
+
+            (string, string) user_or_chat_in_some_language = App.Language.Name.Equals("uk-UA") ? ("Користувач:", "Чат GPT:") : ("User:", "ChatGPT:");
+            string userInput = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd).Text;
+            string requestMsg = userInput.Split(new string[] { user_or_chat_in_some_language.Item1 }, StringSplitOptions.None).Last().Trim();
+
+            Console.WriteLine("Request message:{\"" + requestMsg + "\"}");
+            Console.ResetColor();
+
+            string chatGPTResponse = await _openAIClient.SendMessageAsync(requestMsg);
+
+            user_or_chat_in_some_language = App.Language.Name.Equals("uk-UA") ? ("Користувач:", "Чат GPT:") : ("User:", "ChatGPT:");
+            System.Windows.Documents.Paragraph chatGPT_paragraph = new System.Windows.Documents.Paragraph(
+                new System.Windows.Documents.Run($"{user_or_chat_in_some_language.Item2} {chatGPTResponse}"))
+            { Foreground = Brushes.MediumBlue };
+            chatGPT_paragraph.Margin = new System.Windows.Thickness(0, 0, 0, 7);
+            richTextBox.Document.Blocks.Add(chatGPT_paragraph);
+            richTextBox.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run($"{user_or_chat_in_some_language.Item1} ")));
 
             richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
             Keyboard.Focus(richTextBox);
@@ -138,16 +207,16 @@ namespace OpenAI_WPF_Client.Windows
 
         private void scenariosButton_Click(object sender, RoutedEventArgs e)
         {
-            ScenariosWindow scenarios = new ScenariosWindow(scenariosRepository, scenariosComboBox);
+            ScenariosWindow scenarios = new ScenariosWindow(_scenarioRepository, scenariosComboBox);
             scenarios.Owner = this;
             this.Hide();
             scenarios.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             scenarios.Show();
         }
 
-        private void goToMalePageButton_Click(object sender, RoutedEventArgs e)
+        private void goToEmailPageButton_Click(object sender, RoutedEventArgs e)
         {
-            SendDialogue saveDialogue = new SendDialogue(this.richTextBox);
+            SendDialogue saveDialogue = new SendDialogue(this.richTextBox, _emailOperations);
             saveDialogue.Owner = this;
             this.Hide();
             saveDialogue.WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -155,69 +224,12 @@ namespace OpenAI_WPF_Client.Windows
         }
         private void openFilebutton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog()
-            {
-                AddExtension = true,
-                Filter =
-                        "All Documents (*.docx;*.docm;*.doc;*.dotx;*.dotm;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt)|*.docx;*.docm;*.dotx;*.dotm;*.doc;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt|" +
-                        "Word Documents (*.docx)|*.docx|" +
-                        "Word Macro-Enabled Documents (*.docm)|*.docm|" +
-                        "Word 97-2003 Documents (*.doc)|*.doc|" +
-                        "Word Templates (*.dotx)|*.dotx|" +
-                        "Word Macro-Enabled Templates (*.dotm)|*.dotm|" +
-                        "Word 97-2003 Templates (*.dot)|*.dot|" +
-                        "Web Pages (*.htm;*.html)|*.htm;*.html|" +
-                        "PDF (*.pdf)|*.pdf|" +
-                        "Rich Text Format (*.rtf)|*.rtf|" +
-                        "Flat OPC (*.xml)|*.xml|" +
-                        "Plain Text (*.txt)|*.txt"
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    DocumentModel.Load(dialog.FileName).Save(stream, SaveOptions.RtfDefault);
-                    stream.Position = 0;
-
-                    richTextBox.Document.Blocks.Clear();
-                    var textRange = new TextRange(this.richTextBox.Document.ContentStart, this.richTextBox.Document.ContentEnd);
-                    textRange.Load(stream, DataFormats.Rtf);
-                }
-            }
+            _fileOperations.OpenFile();
         }
 
         private void saveAsbutton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new SaveFileDialog()
-            {
-                AddExtension = true,
-                Filter =
-                        "Word Document (*.docx)|*.docx|" +
-                        "Word Macro-Enabled Document (*.docm)|*.docm|" +
-                        "Word Template (*.dotx)|*.dotx|" +
-                        "Word Macro-Enabled Template (*.dotm)|*.dotm|" +
-                        "PDF (*.pdf)|*.pdf|" +
-                        "XPS Document (*.xps)|*.xps|" +
-                        "Web Page (*.htm;*.html)|*.htm;*.html|" +
-                        "Single File Web Page (*.mht;*.mhtml)|*.mht;*.mhtml|" +
-                        "Rich Text Format (*.rtf)|*.rtf|" +
-                        "Flat OPC (*.xml)|*.xml|" +
-                        "Plain Text (*.txt)|*.txt|" +
-                        "Image (*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.tif;*.tiff;*.wdp)|*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.tif;*.tiff;*.wdp"
-            };
-
-            if (dialog.ShowDialog(this) == true)
-            {
-                using (MemoryStream _stream = new MemoryStream())
-                {
-                    var textRange = new TextRange(this.richTextBox.Document.ContentStart, this.richTextBox.Document.ContentEnd);
-                    textRange.Save(_stream, DataFormats.Rtf);
-                    _stream.Position = 0;
-
-                    DocumentModel.Load(_stream, LoadOptions.RtfDefault).Save(dialog.FileName);
-                }
-            }
+            _fileOperations.SaveFileAs();
         }
 
     }
