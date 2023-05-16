@@ -34,24 +34,21 @@ namespace OpenAI_WPF_Client.Windows
     {
         private ChatGPT_Context chatGPT_Client;
 
-        private readonly IHttpClientFactory _httpClientFactory;
+        //private readonly IHttpClientFactory _httpClientFactory;
         private readonly IOpenAIClient _openAIClient;
         private IScenarioRepository _scenarioRepository;
         private IEmailOperations _emailOperations;
         private IFileOperations _fileOperations;
-        public MainWindow(IHttpClientFactory httpClientFactory, IScenarioRepository scenarioRepository, IEmailOperations emailOperations, IFileOperations fileOperations)
+        public MainWindow(IOpenAIClient openAIClient, IScenarioRepository scenarioRepository, IEmailOperations emailOperations, IFileOperations fileOperations)
         {
             InitializeComponent();
             Console.OutputEncoding = Encoding.UTF8;
-            //var config = new ConfigurationBuilder()
-            //                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            //                    .Build();
             this._fileOperations = fileOperations;
             this._fileOperations.Rtb = richTextBox;
             this._emailOperations = emailOperations;
             this._scenarioRepository = scenarioRepository;
-            this._httpClientFactory = httpClientFactory;
-            this._openAIClient = new OpenAIClient(App.Configuration, _httpClientFactory, "2");
+            this._openAIClient = openAIClient;
+            //this._openAIClient = new OpenAIClient(App.Configuration, _httpClientFactory, "2");
 
             App.LanguageChanged += LanguageChanged;
             CultureInfo currentLang = App.Language;
@@ -186,7 +183,7 @@ namespace OpenAI_WPF_Client.Windows
 
         private void authorizeButton_Click(object sender, RoutedEventArgs e)
         {
-            Environment.SetEnvironmentVariable("OPENAI_API_KEY", keyTextBox.Text, EnvironmentVariableTarget.User);
+            //Environment.SetEnvironmentVariable("OPENAI_API_KEY", keyTextBox.Text, EnvironmentVariableTarget.User);
             if (App.Language.Name.Equals("uk-UA"))
             {
                 richTextBox.AppendText("Користувач: ");

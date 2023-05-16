@@ -6,6 +6,7 @@ using OpenAI.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace ConsoleClient
 {
@@ -13,20 +14,24 @@ namespace ConsoleClient
     {
         static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
+            var host = Host.CreateDefaultBuilder()
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHttpClient();
-                services.AddTransient<IOpenAIClient, OpenAIClient>();
-            }).UseConsoleLifetime();
+                services.AddTransient<IOpenAIClient, OpenAIClient>(
+                    serviceProvider => new OpenAIClient(
+                        //configuration: serviceProvider.GetRequiredService<IConfiguration>(), //both variants seem to work ok
+                        configuration: new ConfigurationBuilder()
+                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                .Build(),
+                        httpClientFactory: serviceProvider.GetService<IHttpClientFactory>(),
+                        modelId: "2")
+                    );
+            }).UseConsoleLifetime().Build();
 
-            var host = builder.Build();
 
-            IConfiguration config = new ConfigurationBuilder()
-                                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                                            .Build();
-
-            var chatGPT = ActivatorUtilities.CreateInstance<OpenAIClient>(host.Services, config, "2");
+            //var chatGPT = ActivatorUtilities.CreateInstance<OpenAIClient>(host.Services, "3"); //both variants seem to work ok
+            var chatGPT = host.Services.GetService<IOpenAIClient>();
 
             bool continueChat = true;
             do

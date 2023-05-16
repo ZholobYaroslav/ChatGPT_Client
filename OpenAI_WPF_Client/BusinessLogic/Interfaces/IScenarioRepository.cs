@@ -10,8 +10,8 @@ namespace OpenAI_WPF_Client.BusinessLogic
     {
         void ScenarioDataSeeding();
         void AddScenario(Scenario scenario);
-        void RemoveScenario(Scenario scenario);
-        void EditScenario(Scenario scenario, Scenario updatedScenario);
+        void RemoveScenario(int id);
+        void EditScenario(int id, Scenario updatedScenario);
         List<Scenario> Scenarios { get; }
     }
 }

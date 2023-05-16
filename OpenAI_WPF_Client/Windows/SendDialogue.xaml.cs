@@ -23,6 +23,7 @@ using MimeKit;
 using GemBox.Document;
 using System.Net.Mime;
 using OpenAI_WPF_Client.BusinessLogic.Interfaces;
+using OpenAI_WPF_Client.BusinessLogic;
 
 namespace OpenAI_WPF_Client.Windows
 {
@@ -32,7 +33,6 @@ namespace OpenAI_WPF_Client.Windows
     public partial class SendDialogue : Window
     {
         private IEmailOperations _emailOperations;
-
         public SendDialogue(RichTextBox rtb, IEmailOperations emailOperations)
         {
             InitializeComponent();
@@ -54,19 +54,44 @@ namespace OpenAI_WPF_Client.Windows
 
         private void sendButton_Click(object sender, RoutedEventArgs e)
         {
-            _emailOperations.SendEmail(fromNameTextBox.Text, fromEmailTextBox.Text, toNameTextBox.Text, toEmailTextBox.Text, subjectTextBox.Text,
-                bodyTextBox.Text, appPasswordBox.Password.Trim());
+            _emailOperations.SendEmail(InitializeEmailMessage());
         }
 
         private void addAttachmentButton_Click(object sender, RoutedEventArgs e)
         {
-            _emailOperations.AddAttachment();
+            var openFileDialog = new OpenFileDialog()
+            {
+                AddExtension = true,
+                Filter =
+                "All Documents (*.docx;*.docm;*.doc;*.dotx;*.dotm;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt)|" +
+                "*.docx;*.docm;*.dotx;*.dotm;*.doc;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt|" +
+                "Word Documents (*.docx)|*.docx|" +
+                "Word Macro-Enabled Documents (*.docm)|*.docm|" +
+                "Word 97-2003 Documents (*.doc)|*.doc|" +
+                "Word Templates (*.dotx)|*.dotx|" +
+                "Word Macro-Enabled Templates (*.dotm)|*.dotm|" +
+                "Word 97-2003 Templates (*.dot)|*.dot|" +
+                "Web Pages (*.htm;*.html)|*.htm;*.html|" +
+                "PDF (*.pdf)|*.pdf|" +
+                "Rich Text Format (*.rtf)|*.rtf|" +
+                "Flat OPC (*.xml)|*.xml|" +
+                "Plain Text (*.txt)|*.txt",
+                FilterIndex = 9
+            };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                _emailOperations.AddAttachment(openFileDialog.FileName);
+            }
             sendEmailButton.IsEnabled = true;
         }
 
         private void saveAttachSendButton_Click(object sender, RoutedEventArgs e)
         {
-            _emailOperations.SaveAddAttachmentSend(fromNameTextBox.Text, fromEmailTextBox.Text, toNameTextBox.Text, toEmailTextBox.Text, subjectTextBox.Text,
+            _emailOperations.SaveAddAttachmentSend(InitializeEmailMessage());
+        }
+        private EmailMessage InitializeEmailMessage()
+        {
+            return new EmailMessage(fromNameTextBox.Text, fromEmailTextBox.Text, toNameTextBox.Text, toEmailTextBox.Text, subjectTextBox.Text,
                 bodyTextBox.Text, appPasswordBox.Password.Trim());
         }
     }

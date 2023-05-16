@@ -23,18 +23,21 @@ namespace OpenAI_WPF_Client.BusinessLogic
             return Caption;
         }
 
+        public int Id { get; set; }
         public string Caption { get; set; }
         public string Description { get; set; }
         public Severity SeverityLevel { get; set; }
 
         public Scenario(Scenario scenario)
         {
+            Id = scenario.Id;
             Caption = scenario.Caption;
             Description = scenario.Description;
             SeverityLevel = scenario.SeverityLevel;
         }
-        public Scenario(string caption, string description, Severity severityLevel)
+        public Scenario(int id, string caption, string description, Severity severityLevel)
         {
+            Id = id;
             Caption = caption;
             Description = description;
             SeverityLevel = severityLevel;
@@ -49,11 +52,11 @@ namespace OpenAI_WPF_Client.BusinessLogic
                 $"tell me what actions I should do to save my life in case of {situation}. " +
                 $"Give bullet points, stay concise and start your response already with 1... 2... without any sum-up talks. Go!";
         }
-        public void UpdateScenario(string captionUpdate, string desriptionUpdate, Severity severityUpdated)
+        public void UpdateScenario(Scenario scenario)
         {
-            Caption = captionUpdate;
-            Description = desriptionUpdate;
-            SeverityLevel = severityUpdated;
+            Caption = scenario.Caption;
+            Description = scenario.Description;
+            SeverityLevel = scenario.SeverityLevel;
         }
     }
 }
