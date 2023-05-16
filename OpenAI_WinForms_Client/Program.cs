@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenAI.Client;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace OpenAI_WinForms_Client
@@ -18,7 +19,7 @@ namespace OpenAI_WinForms_Client
             var host = CreateHostBuilder().Build();
             ServiceProvider = host.Services;
 
-            CreateConfiguration();
+            //CreateConfiguration(); //both variants seem to work ok
 
             Application.Run(ServiceProvider.GetRequiredService<Form1>());
         }
@@ -31,6 +32,15 @@ namespace OpenAI_WinForms_Client
                 {
                     services.AddTransient<Form1>();
                     services.AddHttpClient();
+                    services.AddTransient<IOpenAIClient, OpenAIClient>(
+                        serviceProvider => new OpenAIClient(
+                        //configuration: serviceProvider.GetRequiredService<IConfiguration>(), //both variants seem to work ok
+                        configuration: new ConfigurationBuilder()
+                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                .Build(),
+                        httpClientFactory: serviceProvider.GetRequiredService<IHttpClientFactory>(),
+                        modelId: "44")
+                        );
                 });
         }
         static void CreateConfiguration()

@@ -23,49 +23,27 @@ namespace OpenAI_WPF_Client.BusinessLogic
 
         public EmailOperations() { }
 
-        public void AddAttachment()
+        public void AddAttachment(string fileName)
         {
-            var openFileDialog = new OpenFileDialog()
+            Attachment = new MimePart("application", "octet-stream")
             {
-                AddExtension = true,
-                Filter =
-                            "All Documents (*.docx;*.docm;*.doc;*.dotx;*.dotm;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt)|" +
-                            "*.docx;*.docm;*.dotx;*.dotm;*.doc;*.dot;*.htm;*.html;*.rtf;*.xml;*.txt|" +
-                            "Word Documents (*.docx)|*.docx|" +
-                            "Word Macro-Enabled Documents (*.docm)|*.docm|" +
-                            "Word 97-2003 Documents (*.doc)|*.doc|" +
-                            "Word Templates (*.dotx)|*.dotx|" +
-                            "Word Macro-Enabled Templates (*.dotm)|*.dotm|" +
-                            "Word 97-2003 Templates (*.dot)|*.dot|" +
-                            "Web Pages (*.htm;*.html)|*.htm;*.html|" +
-                            "PDF (*.pdf)|*.pdf|" +
-                            "Rich Text Format (*.rtf)|*.rtf|" +
-                            "Flat OPC (*.xml)|*.xml|" +
-                            "Plain Text (*.txt)|*.txt",
-                FilterIndex = 9
+                Content = new MimeContent(File.OpenRead(fileName)),
+                ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = fileName
             };
-            if (openFileDialog.ShowDialog() == true)
-            {
-                Attachment = new MimePart("application", "octet-stream")
-                {
-                    Content = new MimeContent(File.OpenRead(openFileDialog.FileName)),
-                    ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Attachment),
-                    ContentTransferEncoding = ContentEncoding.Base64,
-                    FileName = openFileDialog.FileName
-                };
-            }
         }
 
-        public void SendEmail(string fromName, string fromEmailAddress, string toName, string toEmailAddress, string subject, string body, string appPassword)
+        public void SendEmail(EmailMessage message)
         {
             var email = new MimeMessage();
             var builder = new BodyBuilder();
 
-            email.From.Add(new MailboxAddress(fromName, fromEmailAddress));
-            email.To.Add(new MailboxAddress(toName, toEmailAddress));
-            email.Subject = subject;
+            email.From.Add(new MailboxAddress(message.FromName, message.FromEmailAddress));
+            email.To.Add(new MailboxAddress(message.ToName, message.ToEmailAddress));
+            email.Subject = message.Subject;
 
-            builder.TextBody = body;
+            builder.TextBody = message.Body;
             builder.Attachments.Add(Attachment);
 
             email.Body = builder.ToMessageBody();
@@ -74,7 +52,7 @@ namespace OpenAI_WPF_Client.BusinessLogic
             {
                 smtp.Connect("smtp.gmail.com", 465, true);
 
-                smtp.Authenticate(fromEmailAddress, appPassword);
+                smtp.Authenticate(message.FromEmailAddress, message.AppPassword);
 
                 smtp.Send(email);
                 MessageBox.Show("Email was sent!", "Done", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -82,7 +60,7 @@ namespace OpenAI_WPF_Client.BusinessLogic
             }
         }
 
-        public void SaveAddAttachmentSend(string fromName, string fromEmailAddress, string toName, string toEmailAddress, string subject, string body, string appPassword)
+        public void SaveAddAttachmentSend(EmailMessage message)
         {
             using (MemoryStream _stream = new MemoryStream())
             {
@@ -99,7 +77,7 @@ namespace OpenAI_WPF_Client.BusinessLogic
                     ContentTransferEncoding = ContentEncoding.Base64,
                     FileName = "WPF_ChatGPT_Dialogue_Sended.pdf"
                 };
-                SendEmail(fromName, fromEmailAddress, toName, toEmailAddress, subject, body, appPassword);
+                SendEmail(message);
             }
         }
     }

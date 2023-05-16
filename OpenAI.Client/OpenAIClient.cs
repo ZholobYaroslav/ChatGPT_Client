@@ -30,7 +30,9 @@ namespace OpenAI.Client
         {
             var configSection = configuration.GetSection(_configSectionName);
 
-            _apiKey = configSection[_apiKeyConfigName] ?? string.Empty;
+            //_apiKey = configSection[_apiKeyConfigName] ?? string.Empty;
+            _apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+
             _modelId = configSection[_openAIModelIdConfigName] ?? string.Empty;
             _modelApiEndpoint = configSection[_completionEndpointConfigName] ?? string.Empty;
 

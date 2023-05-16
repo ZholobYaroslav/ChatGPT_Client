@@ -51,7 +51,7 @@ namespace OpenAI_WPF_Client.Windows
                 MessageBox.Show("Can not TryParse enum");
             }
 
-            Scenario scenario = new Scenario(caption, description, severity);
+            Scenario scenario = new Scenario(0, caption, description, severity);
             _scenarioRepository.AddScenario(scenario);
             scenariosDataGrid.Items.Refresh();
         }
@@ -65,8 +65,8 @@ namespace OpenAI_WPF_Client.Windows
                 MessageBox.Show("Can not TryParse enum");
             }
             Scenario? scenarioToUpdate = scenariosDataGrid.SelectedItem as Scenario;
-            Scenario scenarioUpdated = new Scenario(caption, description, severity);
-            _scenarioRepository.EditScenario(scenarioToUpdate, scenarioUpdated);
+            Scenario scenarioUpdated = new Scenario(0, caption, description, severity);
+            _scenarioRepository.EditScenario(scenarioToUpdate.Id, scenarioUpdated);
 
             scenariosDataGrid.Items.Refresh();
         }
@@ -80,7 +80,7 @@ namespace OpenAI_WPF_Client.Windows
                 MessageBox.Show("Can not TryParse enum");
             }
             Scenario? scenarioToDelete = scenariosDataGrid.SelectedItem as Scenario;
-            _scenarioRepository.RemoveScenario(scenarioToDelete);
+            _scenarioRepository.RemoveScenario(scenarioToDelete.Id);
 
             scenariosDataGrid.Items.Refresh();
         }

@@ -7,14 +7,14 @@ namespace OpenAI_WinForms_Client
     {
         private ChatGPT_Context chatGPT_Client;
 
-        private IHttpClientFactory _httpClientFactory;
+
         private IOpenAIClient _openAIClient;
-        public Form1(IHttpClientFactory httpClientFactory)
+        public Form1(IOpenAIClient openAIClient)
         {
             InitializeComponent();
-            _httpClientFactory = httpClientFactory;
+            _openAIClient = openAIClient;
 
-            _openAIClient = new OpenAIClient(Program.Configuration, _httpClientFactory, "4");
+            //_openAIClient = new OpenAIClient(Program.Configuration, _httpClientFactory, "4");
 
             this.richTextBox.Text += "User: ";
         }

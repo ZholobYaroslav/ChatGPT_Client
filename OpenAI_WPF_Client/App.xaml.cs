@@ -12,6 +12,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -32,7 +33,6 @@ namespace OpenAI_WPF_Client
         }
         public App()
         {
-
             AppHost = Host.CreateDefaultBuilder()
                 .ConfigureServices( (hostContext, services) =>
                 {
@@ -41,6 +41,14 @@ namespace OpenAI_WPF_Client
                     services.AddTransient<IScenarioRepository, ScenarioInMemoryRepository>();
                     services.AddTransient<IEmailOperations, EmailOperations>();
                     services.AddTransient<IFileOperations, FileOperations>();
+                    services.AddTransient<IOpenAIClient, OpenAIClient>(
+                        serviceProvider => new OpenAIClient(
+                        //configuration: serviceProvider.GetRequiredService<IConfiguration>(), //both variants seem to work ok
+                        configuration: new ConfigurationBuilder()
+                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                .Build(),
+                            httpClientFactory: serviceProvider.GetRequiredService<IHttpClientFactory>(),
+                            modelId: "555"));
                 })
                 .Build();
 

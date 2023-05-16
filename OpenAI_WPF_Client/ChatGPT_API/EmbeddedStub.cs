@@ -8,7 +8,7 @@ namespace OpenAI_WPF_Client.ChatGPT_API
 {
     internal class EmbeddedStub
     {
-        private const string apiKey = "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";// my personal token on chatopenai website
+        private const string apiKey = "";// my personal token on chatopenai website
 
         public static string ApiKey
         {
