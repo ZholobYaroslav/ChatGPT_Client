@@ -1,17 +1,43 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
 namespace OpenAI_WinForms_Client
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var host = CreateHostBuilder().Build();
+            ServiceProvider = host.Services;
+
+            CreateConfiguration();
+
+            Application.Run(ServiceProvider.GetRequiredService<Form1>());
+        }
+        public static IServiceProvider ServiceProvider { get; private set; }
+        public static IConfiguration Configuration { get; private set; }
+        static IHostBuilder CreateHostBuilder()
+        {
+            return Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddTransient<Form1>();
+                    services.AddHttpClient();
+                });
+        }
+        static void CreateConfiguration()
+        {
+            Configuration = new ConfigurationBuilder()
+                                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                            .Build();
         }
     }
 }

@@ -40,6 +40,6 @@
                 RenderTransformOrigin="1.008,-0.913" Height="22" Width="114" Click="saveAsbutton_Click"/>
 
         <Button x:Name="mailButton" Content="{DynamicResource m_mailButton}" HorizontalAlignment="Left" Margin="495,408,0,0" 
-                VerticalAlignment="Top" Width="271" Height="22" Click="goToMalePageButton_Click"/>
+                VerticalAlignment="Top" Width="271" Height="22" Click="goToEmailPageButton_Click"/>
     </Grid>
 </Window>

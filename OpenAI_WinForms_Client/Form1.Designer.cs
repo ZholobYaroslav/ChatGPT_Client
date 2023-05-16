@@ -28,17 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            richTextBox1 = new RichTextBox();
+            richTextBox = new RichTextBox();
             button1 = new Button();
             SuspendLayout();
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(49, 24);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(702, 332);
-            richTextBox1.TabIndex = 0;
-            richTextBox1.Text = "";
+            richTextBox.Location = new Point(49, 24);
+            richTextBox.Name = "richTextBox1";
+            richTextBox.Size = new Size(702, 332);
+            richTextBox.TabIndex = 0;
+            richTextBox.Text = "";
             // 
             // button1
             // 
@@ -57,7 +57,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(button1);
-            Controls.Add(richTextBox1);
+            Controls.Add(richTextBox);
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
@@ -65,7 +65,7 @@
 
         #endregion
 
-        private RichTextBox richTextBox1;
+        private RichTextBox richTextBox;
         private Button button1;
     }
 }

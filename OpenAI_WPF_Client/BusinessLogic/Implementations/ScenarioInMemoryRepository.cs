@@ -2,21 +2,23 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Animation;
 
 namespace OpenAI_WPF_Client.BusinessLogic
 {
-    public class ScenariosRepository
+    public class ScenarioInMemoryRepository : IScenarioRepository
     {
-        public List<Scenario> Scenarios { get; }
+        private List<Scenario> _scenarios;
+        public List<Scenario> Scenarios { get => _scenarios; }
 
-        public ScenariosRepository()
+        public void ScenarioDataSeeding()
         {
             if (App.Language.Name.Equals("uk-UA"))
             {
-                Scenarios = new List<Scenario>
+                _scenarios = new List<Scenario>
                 {
                     new Scenario("Землетрус", Scenario.UseDescriptionTemplate("Землетрус"), Scenario.Severity.Significant),
                     new Scenario("Цунамі", Scenario.UseDescriptionTemplate("Цунамі"), Scenario.Severity.Significant),
@@ -26,7 +28,7 @@ namespace OpenAI_WPF_Client.BusinessLogic
             }
             else
             {
-                Scenarios = new List<Scenario>
+                _scenarios = new List<Scenario>
                 {
                     new Scenario("Earthquake", Scenario.UseDescriptionTemplate("Earthquake"), Scenario.Severity.Significant),
                     new Scenario("Tsunami", Scenario.UseDescriptionTemplate("Tsunami"), Scenario.Severity.Significant),
@@ -34,6 +36,11 @@ namespace OpenAI_WPF_Client.BusinessLogic
                     new Scenario("Nuclear Threat", Scenario.UseDescriptionTemplate("Nuclear Threat"), Scenario.Severity.Significant),
                 };
             }
+        }
+
+        public ScenarioInMemoryRepository()
+        {
+            this.ScenarioDataSeeding();
         }
 
         public void AddScenario(Scenario scenario)

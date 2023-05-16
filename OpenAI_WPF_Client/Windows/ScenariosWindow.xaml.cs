@@ -21,14 +21,14 @@ namespace OpenAI_WPF_Client.Windows
     /// </summary>
     public partial class ScenariosWindow : Window
     {
-        private ScenariosRepository _scenariosRepository;
+        private IScenarioRepository _scenarioRepository;
         private ComboBox _scenariosComboBox;
-        public ScenariosWindow(ScenariosRepository _scenariosRepository, ComboBox comboBox)
+        public ScenariosWindow(IScenarioRepository scenarioRepository, ComboBox comboBox)
         {
             InitializeComponent();
-            this._scenariosRepository = _scenariosRepository;
+            this._scenarioRepository = scenarioRepository;
             this._scenariosComboBox = comboBox;
-            scenariosDataGrid.ItemsSource = this._scenariosRepository.Scenarios;
+            scenariosDataGrid.ItemsSource = this._scenarioRepository.Scenarios;
         }
 
         private void buttonBack_Click(object sender, RoutedEventArgs e)
@@ -52,7 +52,7 @@ namespace OpenAI_WPF_Client.Windows
             }
 
             Scenario scenario = new Scenario(caption, description, severity);
-            _scenariosRepository.AddScenario(scenario);
+            _scenarioRepository.AddScenario(scenario);
             scenariosDataGrid.Items.Refresh();
         }
 
@@ -66,7 +66,7 @@ namespace OpenAI_WPF_Client.Windows
             }
             Scenario? scenarioToUpdate = scenariosDataGrid.SelectedItem as Scenario;
             Scenario scenarioUpdated = new Scenario(caption, description, severity);
-            _scenariosRepository.EditScenario(scenarioToUpdate, scenarioUpdated);
+            _scenarioRepository.EditScenario(scenarioToUpdate, scenarioUpdated);
 
             scenariosDataGrid.Items.Refresh();
         }
@@ -80,7 +80,7 @@ namespace OpenAI_WPF_Client.Windows
                 MessageBox.Show("Can not TryParse enum");
             }
             Scenario? scenarioToDelete = scenariosDataGrid.SelectedItem as Scenario;
-            _scenariosRepository.RemoveScenario(scenarioToDelete);
+            _scenarioRepository.RemoveScenario(scenarioToDelete);
 
             scenariosDataGrid.Items.Refresh();
         }
